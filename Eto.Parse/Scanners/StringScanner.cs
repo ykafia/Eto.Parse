@@ -1,9 +1,12 @@
 using System;
+using CommunityToolkit.HighPerformance.Buffers;
 
 namespace Eto.Parse.Scanners
 {
 	public class StringScanner : Scanner
 	{
+		static StringPool pool = new StringPool();
+
 		readonly int end;
 		readonly int start;
 		readonly string value;
@@ -102,7 +105,8 @@ namespace Eto.Parse.Scanners
 			if (index < end)
 			{
 				length = Math.Min(index + length, end) - index;
-				return value.Substring(index, length);
+				var slice = value.AsSpan().Slice(index, length);
+				return pool.GetOrAdd(slice);
 			}
 			return null;
 		}
